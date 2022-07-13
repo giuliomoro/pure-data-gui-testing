@@ -5,6 +5,7 @@ import os
 import subprocess
 import tempfile
 import shutil
+import re
 
 class CustomException(Exception):
     """ My custom exception"""
@@ -69,12 +70,12 @@ def main(argv):
                 break
             pds.append(argv[n])
             n = n + 1
-        pdArgs = []
+        pdArgsInit = []
         #ensure we print GUI debugging
-        pdArgs = [ '-d', '1' ]
+        pdArgsInit = [ '-d', '1' ]
         # everything else are arguments to Pd
         for n in range(n, len(argv)): # one of these will be the test patch (if any)
-            pdArgs.append(argv[n])
+            pdArgsInit.append(argv[n])
 
         pathname = os.path.dirname(sys.argv[0])
         pdGuiParser = os.path.abspath(pathname) + '/pd-gui-parser'
@@ -89,6 +90,9 @@ def main(argv):
                 if 1 != count:
                     outFileName = outFileName + '-%d' % c
                 pdOutFileNames.append(outFileName)
+                pdArgs = []
+                for n in range(len(pdArgsInit)):
+                    pdArgs.append(re.sub('{}', outFileName, pdArgsInit[n]))
                 if runPd:
                     command = [ pds[b] ] + pdArgs
                     ret = runAndHandle(command)
