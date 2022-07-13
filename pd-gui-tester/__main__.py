@@ -89,6 +89,8 @@ def main(argv):
             tmpDir = tempfile.mkdtemp() # TODO: avoid creating if `--tmp` is passed
         pdOutFileNames = []
         retVal = 0
+        totalTests = 0
+        successfulTests = 0
         # go through all instances of Pd
         for c in range(0, count):
             for b in range(0, len(pds)):
@@ -132,7 +134,9 @@ def main(argv):
                         trName = outFileName + '.svg-tr'
                         ret = runAndHandle(['diff', refTrName, trName])
                         successfulTests = successfulTests + 1
-        print("All good")
+        print("%d out of %d tests passed" % (successfulTests, totalTests))
+        if not totalTests:
+            print("NOTE: you ran 0 tests. Did you mean `--svg` and/or `--log`?")
         if not userProvidedTmpDir:
             shutil.rmtree(tmpDir) # leak temp folder in case of exception so files can be inspected
         return 0
