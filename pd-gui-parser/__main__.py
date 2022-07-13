@@ -127,46 +127,53 @@ def main(argv):
             dic = {}
             dicId = 0
             lappendCount = 0
+            firstLine = True
+            isPdLog = True
             for line in ifile:
                 line = line.strip()
-                guiLineSignature = '^>>'
-                res = re.search(guiLineSignature, line)
-                # ignore some lines. Do so by setting them to blank so that line
-                # numbers match before and after translation
-                if not res:
-                    # ignore non-GUI line
-                    line = ''
-                # remove GUI signature
-                line = re.sub(guiLineSignature, '', line).strip()
-                if line == "pdtk_ping":
-                    line = ''
-                if re.search('^lappend ::tmp_path {', line):
-                    lappendCount = lappendCount + 1
-                    if 5 == lappendCount:
-                        # the fifth entry normally is the extra/ folder that is
-                        # relative to the path of the executable. Ignore it
-                        if re.search('^lappend ::tmp_path {.*/extra}', line):
-                            line = ''
-                # "lint" tcl syntax
-                line = re.sub('[ \t]{1,}', ' ', line) # remove duplicated spaces
-                line = re.sub('\{[ \t]{1,}', '{', line) # remove spaces around braces
-                line = re.sub('[ \t]{1,}\}', '}', line) # remove spaces around braces
-                line = re.sub('[ \t]$', '', line) # remove trailing spaces
-                line = re.sub(';$', '', line) # remove trailing semicolons
-                line = re.sub('[ \t]$', '', line) # remove trailing spaces
-                # tokenize and rebuild with braces
-                """
-                # some example lines for testing {,de}tokenize
-                #line  ="{set} ::sys_staticpath {{a b c} {a b {e f g} c d } {/Users/giulio/pure-data/extra}}"
-                #line = "rr {qq} {aa bb cc} {dd ee {ff gg hh} ii mm } {nn} pp"
-                #line = "a b {e f g} c d"
-                line = "cc dd ee {one two} [ list aa bb cc ][list dd ee ff gg]{another four four2 four3} three"
-                """
-                tokens = tokenize(line)
-                print(line)
-                print(tokens)
-                line = detokenize(tokens)
-                print(line)
+                # quick check for whether it's XML. This allows us to process
+                # svg file without much effort
+                # TODO: it would be safer to parse it and replace all IDs via
+                # dictionary
+                if "<?xml version='1.0'?>" == line:
+                    isPdLog = False
+                firstLine = False
+                if isPdLog:
+                    guiLineSignature = '^>>'
+                    res = re.search(guiLineSignature, line)
+                    # ignore some lines. Do so by setting them to blank so that line
+                    # numbers match before and after translation
+                    if not res:
+                        # ignore non-GUI line
+                        line = ''
+                    # remove GUI signature
+                    line = re.sub(guiLineSignature, '', line).strip()
+                    if line == "pdtk_ping":
+                        line = ''
+                    if re.search('^lappend ::tmp_path {', line):
+                        lappendCount = lappendCount + 1
+                        if 5 == lappendCount:
+                            # the fifth entry normally is the extra/ folder that is
+                            # relative to the path of the executable. Ignore it
+                            if re.search('^lappend ::tmp_path {.*/extra}', line):
+                                line = ''
+                    # "lint" tcl syntax
+                    line = re.sub('[ \t]{1,}', ' ', line) # remove duplicated spaces
+                    line = re.sub('\{[ \t]{1,}', '{', line) # remove spaces around braces
+                    line = re.sub('[ \t]{1,}\}', '}', line) # remove spaces around braces
+                    line = re.sub('[ \t]$', '', line) # remove trailing spaces
+                    line = re.sub(';$', '', line) # remove trailing semicolons
+                    line = re.sub('[ \t]$', '', line) # remove trailing spaces
+                    # tokenize and rebuild with braces
+                    """
+                    # some example lines for testing {,de}tokenize
+                    #line  ="{set} ::sys_staticpath {{a b c} {a b {e f g} c d } {/Users/giulio/pure-data/extra}}"
+                    #line = "rr {qq} {aa bb cc} {dd ee {ff gg hh} ii mm } {nn} pp"
+                    #line = "a b {e f g} c d"
+                    line = "cc dd ee {one two} [ list aa bb cc ][list dd ee ff gg]{another four four2 four3} three"
+                    """
+                    tokens = tokenize(line)
+                    line = detokenize(tokens)
 
                 # TODO: we should do some heuristics on ptr len to ensure we
                 # use consistent ptr lengths across lines and avoid false positives
