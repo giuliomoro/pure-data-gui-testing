@@ -180,14 +180,28 @@ def main(argv):
 
                 # TODO: we should do some heuristics on ptr len to ensure we
                 # use consistent ptr lengths across lines and avoid false positives
-                regex = '[0-9a-f]{%d,%d}' % (ptrLen[0], ptrLen[1])
-                res = re.findall(regex, line)
-                for el in res:
-                    if el not in dic:
-                        dic[el] = '_%05d_' % dicId
-                        dicId = dicId + 1 
-                    # translate the string
-                    line = re.sub(el, dic[el], line)
+                ptrRegex = '[0-9a-f]{%d,%d}' % (ptrLen[0], ptrLen[1])
+                # attempt different regexes, the order is important, as we keep
+                # going regardless of whether any match is found
+                # NOTE: these are runnning on post-retokenized strings, so they
+                # may not match verbatim what's in the input file
+                regexes = [
+                    # this one is a workaround to address the inconsistency of
+                    # the subplot tag since tag0 was introduced in
+                    # 1834a3566a411ee24b4f8e2c9f399f024c11e93a s_template:
+                    # convert to pdgui_vmess()
+                    '%s plot%s_array%s_onset-[0-9]+-[0-9]+\+[0-9]+' % (ptrRegex, ptrRegex, ptrRegex),
+                    # simple ptr
+                    ptrRegex,
+                ]
+                for regex in regexes:
+                    res = re.findall(regex, line)
+                    for el in res:
+                        if el not in dic:
+                            dic[el] = '_%05d_' % dicId
+                            dicId = dicId + 1
+                        # translate the string
+                        line = line.replace(el, dic[el])
                 out.append(line)
         if not len(out) or not dicId:
             print('No valid lines or pointers found in', inFileName)
