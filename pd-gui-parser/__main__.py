@@ -126,7 +126,6 @@ def main(argv):
             out = []
             dic = {}
             dicId = 0
-            lappendCount = 0
             firstLine = True
             isPdLog = True
             for line in ifile:
@@ -157,12 +156,10 @@ def main(argv):
                     if re.search('pdtk_plugin_dispatch.*::patch2svg::exportall', line):
                         line = ''
                     if re.search('^lappend ::tmp_path {', line):
-                        lappendCount = lappendCount + 1
-                        if 5 == lappendCount:
-                            # the fifth entry normally is the extra/ folder that is
-                            # relative to the path of the executable. Ignore it
-                            if re.search('^lappend ::tmp_path {.*/extra}', line):
-                                line = ''
+                        # the entry ending with the extra/ folder is
+                        # relative to the path of the executable. Ignore it
+                        if re.search('^lappend ::tmp_path {.*/extra}', line):
+                            line = ''
                     # "lint" tcl syntax
                     line = re.sub('[ \t]{1,}', ' ', line) # remove duplicated spaces
                     line = re.sub('\{[ \t]{1,}', '{', line) # remove spaces around braces
