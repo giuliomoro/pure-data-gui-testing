@@ -1,37 +1,64 @@
-#N canvas 391 131 841 601 12;
-#X obj 127 190 f;
-#X obj 127 238 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc #000000 #000000 0 1;
-#X obj 127 87 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
-#X msg 36 230 0, f 2;
-#X obj 127 62 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000;
-#X floatatom 136 267 5 0 0 0 - - - 0;
-#X obj 224 133 select 1;
-#X obj 127 107 t f f;
-#X msg 221 164 0;
-#X obj 127 214 + 10;
-#X obj 138 312 > 100;
-#X obj 138 348 select 1;
-#X obj 127 163 metro 200;
-#X msg 261 407 \; pd quit;
-#X obj 369 163 r autoquit;
-#X floatatom 368 266 5 0 0 0 - - - 0;
-#X obj 261 331 f;
-#X obj 261 360 select 1;
-#X text 145 462 Quit automatically (e.g.: for batch testing);
-#X obj 261 384 delay 50;
-#X obj 57 146 t b f;
-#X obj 127 3 r autostart;
-#X text 220 37 Use "-send" from the command line instead of loadbang so that the window is fully loaded;
-#X text 221 66 TODO: that's not actually always true (it would seem) \, so also add a delay for good measure;
-#X obj 127 32 delay 300;
+#N canvas 183 15 986 666 12;
+#X obj 127 230 f;
+#X obj 127 278 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X obj 127 127 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 22 182 0, f 2;
+#X obj 127 102 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X floatatom 136 307 5 0 0 0 - - -;
+#X obj 224 173 select 1;
+#X obj 127 147 t f f;
+#X msg 221 204 0;
+#X obj 127 254 + 10;
+#X obj 138 352 > 100;
+#X obj 138 388 select 1;
+#X obj 127 203 metro 200;
+#X msg 261 468 \; pd quit;
+#X obj 345 330 r autoquit;
+#X obj 261 411 f;
+#X obj 261 440 select 1;
+#X text 125 521 Quit automatically (e.g.: for batch testing);
+#X obj 43 98 t b f;
+#X obj 127 13 r autostart;
+#X text 221 66 TODO: that's not actually always true (it would seem)
+\, so also add a delay for good measure;
+#X obj 127 72 delay 300;
 #N canvas 0 22 450 278 (subpatch) 0;
 #X array array1 10 float 2;
 #X coords 0 1 10 -1 200 140 1;
-#X restore 497 245 graph;
+#X restore 676 86 graph;
+#X msg 572 514 \; pd plugin-dispatch ::patch2svg::exportall \$1;
+#X obj 572 479 symbol;
+#X obj 658 334 r svgSavePath;
+#X obj 659 300 s svgSavePath;
+#X obj 658 359 list prepend symbol;
+#X obj 658 385 list trim;
+#X obj 622 422 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 622 403 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 572 452 spigot;
+#X obj 261 330 r done;
+#X obj 42 130 s done;
+#X text 765 329 Use -send for this;
+#X text 220 7 Use "-send" from the command line instead of loadbang
+so that the window is fully loaded and we get consistent behaviour
+;
+#X obj 345 360 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 347 309 Use -send for this;
+#X obj 571 340 r done;
+#X obj 571 370 delay 50;
+#X obj 261 363 delay 100;
+#X msg 659 273 /tmp/mypath.svg;
+#X obj 572 414 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 2 0 7 0;
-#X connect 3 0 20 0;
+#X connect 3 0 18 0;
 #X connect 4 0 2 0;
 #X connect 5 0 10 0;
 #X connect 6 0 8 0;
@@ -43,12 +70,25 @@
 #X connect 10 0 11 0;
 #X connect 11 0 3 0;
 #X connect 12 0 0 0;
-#X connect 14 0 15 0;
-#X connect 15 0 16 1;
-#X connect 16 0 17 0;
-#X connect 17 0 19 0;
-#X connect 19 0 13 0;
-#X connect 20 0 16 0;
-#X connect 20 1 2 0;
-#X connect 21 0 24 0;
-#X connect 24 0 4 0;
+#X connect 14 0 36 0;
+#X connect 15 0 16 0;
+#X connect 16 0 13 0;
+#X connect 18 0 33 0;
+#X connect 18 1 2 0;
+#X connect 19 0 21 0;
+#X connect 21 0 4 0;
+#X connect 24 0 23 0;
+#X connect 25 0 27 0;
+#X connect 25 0 30 0;
+#X connect 27 0 28 0;
+#X connect 28 0 24 1;
+#X connect 29 0 31 1;
+#X connect 30 0 29 0;
+#X connect 31 0 24 0;
+#X connect 32 0 40 0;
+#X connect 36 0 15 1;
+#X connect 38 0 39 0;
+#X connect 39 0 42 0;
+#X connect 40 0 15 0;
+#X connect 41 0 26 0;
+#X connect 42 0 31 0;
