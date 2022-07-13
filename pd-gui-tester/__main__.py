@@ -32,6 +32,8 @@ def main(argv):
         keepGoing = False
         userProvidedTmpDir = False
         count = 1
+        checkLog = False
+        checkSvg = False
         n = 0
         while n < len(argv):
             if '--help' == argv[n] or '-h' == argv[n]:
@@ -52,6 +54,10 @@ def main(argv):
                 if len(argv) < n + 1:
                     return usage()
                 count = int(argv[n])
+            elif '--log' == argv[n]:
+                checkLog = True
+            elif '--svg' == argv[n]:
+                checkSvg = True
             elif '--ptr-len' == argv[n]:
                 # TODO: automatically forward some options to pd-gui-parser
                 n = n + 1
@@ -102,6 +108,11 @@ def main(argv):
                 command = ['python3', pdGuiParser ]
                 if ptrLen:
                     command = command + [ '--ptr-len', ptrLen ]
+                files = []
+                if checkLog:
+                    files.append(outFileName)
+                if checkSvg:
+                    files.append(outFileName + '.svg')
                 command = command + [ outFileName ]
                 ret = runAndHandle(command)
                 print(ret.stdout)
@@ -109,9 +120,18 @@ def main(argv):
                 # after that, we compare each execution with that one
                 if b != 0 or c != 0:
                     # diff against the original
-                    refTrName = pdOutFileNames[0] + '-tr'
-                    trName = outFileName + '-tr'
-                    ret = runAndHandle(['diff', refTrName, trName])
+                    if checkLog:
+                        totalTests = totalTests + 1
+                        refTrName = pdOutFileNames[0] + '-tr'
+                        trName = outFileName + '-tr'
+                        ret = runAndHandle(['diff', refTrName, trName])
+                        successfulTests = successfulTests + 1
+                    if checkSvg:
+                        totalTests = totalTests + 1
+                        refTrName = pdOutFileNames[0] + '.svg-tr'
+                        trName = outFileName + '.svg-tr'
+                        ret = runAndHandle(['diff', refTrName, trName])
+                        successfulTests = successfulTests + 1
         print("All good")
         if not userProvidedTmpDir:
             shutil.rmtree(tmpDir) # leak temp folder in case of exception so files can be inspected
