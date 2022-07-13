@@ -150,6 +150,12 @@ def main(argv):
                     line = re.sub(guiLineSignature, '', line).strip()
                     if line == "pdtk_ping":
                         line = ''
+                    # ignore lines exporting svgs as they will have different paths
+                    # these will look differently before and after
+                    # da000ee4b colourful debugging output
+                    #, hence why we do not run this on the tokenized string and we use the `.*`
+                    if re.search('pdtk_plugin_dispatch.*::patch2svg::exportall', line):
+                        line = ''
                     if re.search('^lappend ::tmp_path {', line):
                         lappendCount = lappendCount + 1
                         if 5 == lappendCount:
