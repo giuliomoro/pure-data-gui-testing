@@ -24,7 +24,7 @@
 #X obj 127 13 r autostart;
 #X text 221 66 TODO: that's not actually always true (it would seem)
 \, so also add a delay for good measure;
-#X obj 127 72 delay 300;
+#X obj 127 72 delay 700;
 #N canvas 0 22 450 278 (subpatch) 0;
 #X array array1 10 float 2;
 #X coords 0 1 10 -1 200 140 1;
