@@ -260,6 +260,24 @@ def main(argv):
                         for n in range(len(tokens[2])):
                             tokens[2][n] = re.sub(r'.*(\/extra[/]*)$', r'______\1', tokens[2][n])
 
+                    # The format for startup_flags changed
+                    # from
+                    #   set ::startup_flags [subst -nocommands {-verbose -another} ]
+                    # to
+                    #   set ::startup_flags {-verbose -another}
+                    # in
+                    #   b175797e use helper-functions for repetitive calls to pdgui_vmess()
+                    if 3 == len(tokens) and 'set' == tokens[0] and '::startup_flags' == tokens[1]:
+                        if len(tokens[2]) >= 3 and '[' == tokens[2][0] and ']' == tokens[2][-1]:
+                            # a command, whose content is in the non-outermost
+                            body = tokens[2][1:-1]
+                            # verify we have the correct one
+                            if not ('subst' == body[0] and '-nocommands' == body[1]):
+                                print('Invalid startup_flags format:', tokens)
+                                return -1
+                            # We strip the command name and flag and keep the arguments:
+                            tokens[2] = body[2]
+
                     line = detokenize(tokens)
 
                 # TODO: we should do some heuristics on ptr len to ensure we
