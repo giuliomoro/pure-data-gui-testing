@@ -148,22 +148,21 @@ def main(argv):
                 if isPdLog:
                     guiLineSignature = '^>>'
                     res = re.search(guiLineSignature, line)
-                    # ignore some lines. Do so by setting them to blank so that line
-                    # numbers match before and after translation
+                    # ignore some lines.
                     if not res:
                         # ignore non-GUI line
-                        line = ''
+                        continue
                     # remove GUI signature
                     line = re.sub(guiLineSignature, '', line).strip()
                     # ignore pings as they happen at non-deterministic times
                     if line == "pdtk_ping":
-                        line = ''
+                        continue
                     # ignore lines exporting svgs as they will have different paths
                     # these will look differently before and after
                     # da000ee4b colourful debugging output
                     #, hence why we do not run this on the tokenized string and we use the `.*`
                     if re.search('pdtk_plugin_dispatch.*::patch2svg::exportall', line):
-                        line = ''
+                        continue
                     # "lint" tcl syntax
                     line = re.sub('[ \t]{1,}', ' ', line) # remove duplicated spaces
                     line = re.sub('\{[ \t]{1,}', '{', line) # remove spaces around braces
@@ -194,13 +193,13 @@ def main(argv):
                     #   b175797e use helper-functions for repetitive calls to pdgui_vmess()
                     # it seems that only instances using tmp_path have been
                     # replaced in that commit
-                    # if we incur in one of these cases, we discard the line with tokens = []
+                    # We discard intermediate lines and only keep the last one
                     tmpVar = '::tmp_path'
                     if len(tokens) >= 2 and 'set' == tokens[0]:
                         if 2 == len(tokens) and tmpVar == tokens[1]:
                             # initialisation
                             sets[tmpVar] = []
-                            tokens = []
+                            continue
                         elif 3 == len(tokens) and '$'+tmpVar == tokens[2]:
                             # assignment
                             dest = tokens[1]
@@ -215,7 +214,7 @@ def main(argv):
                         if tmpVar == tokens[1]:
                             for n in range(2, len(tokens)):
                                 sets[tmpVar].append(tokens[n])
-                            tokens = []
+                            continue
 
                     if 3 == len(tokens) and 'set' == tokens[0] and '::sys_staticpath' == tokens[1]:
                         # the path ending with 'extra' is instance-specific
