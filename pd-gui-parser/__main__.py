@@ -216,9 +216,9 @@ def main(argv):
                                 sets[tmpVar].append(tokens[n])
                             continue
 
+                    # the path ending with 'extra' is instance-specific
+                    # so we replace it
                     if 3 == len(tokens) and 'set' == tokens[0] and '::sys_staticpath' == tokens[1]:
-                        # the path ending with 'extra' is instance-specific
-                        # so we replace it
                         for n in range(len(tokens[2])):
                             tokens[2][n] = re.sub(r'.*(\/extra[/]*)$', r'______\1', tokens[2][n])
 
