@@ -162,11 +162,6 @@ def main(argv):
                     #, hence why we do not run this on the tokenized string and we use the `.*`
                     if re.search('pdtk_plugin_dispatch.*::patch2svg::exportall', line):
                         line = ''
-                    if re.search('^lappend ::tmp_path {', line):
-                        # the entry ending with the extra/ folder is
-                        # relative to the path of the executable. Ignore it
-                        if re.search('^lappend ::tmp_path {.*/extra}', line):
-                            line = ''
                     # "lint" tcl syntax
                     line = re.sub('[ \t]{1,}', ' ', line) # remove duplicated spaces
                     line = re.sub('\{[ \t]{1,}', '{', line) # remove spaces around braces
@@ -183,6 +178,11 @@ def main(argv):
                     line = "cc dd ee {one two} [ list aa bb cc ][list dd ee ff gg]{another four four2 four3} three"
                     """
                     tokens = tokenize(line)
+                    if 3 == len(tokens) and 'set' == tokens[0] and '::sys_staticpath' == tokens[1]:
+                        # the path ending with 'extra' is instance-specific
+                        # so we replace it
+                        for n in range(len(tokens[2])):
+                            tokens[2][n] = re.sub(r'.*(\/extra[/]*)$', r'______\1', tokens[2][n])
                     line = detokenize(tokens)
 
                 # TODO: we should do some heuristics on ptr len to ensure we
