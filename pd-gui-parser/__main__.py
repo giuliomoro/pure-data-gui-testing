@@ -28,6 +28,7 @@ def tokenize(string):
     nest = 0
     n = 0
     escapeOn = False
+    cmds = []
     while n < len(string):
         c = string[n]
         if '[' == c and not escapeOn:
@@ -50,6 +51,8 @@ def tokenize(string):
                     string = string[0:bracketStart] + substr + trail
                     # update pointer to end of replacement
                     n = bracketStart + len(substr) -1
+                else:
+                    cmds.append({ 'start': bracketStart, 'stop': n})
         if '\\' == c and not escapeOn:
             escapeOn = True
         else:
@@ -59,15 +62,41 @@ def tokenize(string):
     token = ''
     tokens = []
     maxNests = []
-    whitespaces = []
+    # know whether Further Processing is needed
+    FP_DONT_RECURSE = 0
+    FP_RECURSE = 1
+    FP_RECURSE_CMD = -1
+    recurse = []
     maxNest = 0
     whitespace = 0
     # recursively process { } entries
     escapeOn = False
+    cmdN = 0
+    if cmdN < len(cmds):
+        cmdStart = cmds[cmdN]['start']
+        cmdStop = cmds[cmdN]['stop']
+    else:
+        cmdStart = -1
+        cmdStop = -1
+
     for n in range(len(string)):
         c = string[n]
         tokenEnds = False
-        if '{' == c and not escapeOn:
+        tokenIsCmd = False
+        if n >= cmdStart and n <= cmdStop:
+            if cmdStop == n:
+                tokenEnds = True
+                tokenIsCmd = True
+                token = string[cmdStart : cmdStop+1]
+                cmdN = cmdN + 1
+                nextCmd = True
+                if cmdN < len(cmds):
+                    cmdStart = cmds[cmdN]['start']
+                    cmdStop = cmds[cmdN]['stop']
+                else:
+                    cmdStart = -1
+                    cmdStop = -1
+        elif '{' == c and not escapeOn:
             if 0 != nest:
                 token = token + c
             nest = nest + 1
@@ -92,13 +121,22 @@ def tokenize(string):
             if token:
                 tokens.append(token)
                 maxNests.append(maxNest)
-                whitespaces.append(whitespace)
+                fp = FP_DONT_RECURSE
+                if tokenIsCmd:
+                    fp = FP_RECURSE_CMD
+                elif whitespace:
+                    fp = FP_RECURSE
+                recurse.append(fp)
                 maxNest = 0
                 whitespace = 0
             token = ''
 
     for n in range(len(tokens)):
-        if maxNests[n] > 1 or (1 == maxNests[n] and whitespaces[n] >= 1):
+        if FP_RECURSE_CMD == recurse[n]:
+            if tokens[n][0] != '[' or tokens[n][-1] != ']':
+                raise('Error with token', n, 'expected to be cmd but actually got', tokens)
+            tokens[n] = ['['] + tokenize(tokens[n][1:-1]) + [']']
+        elif maxNests[n] > 1 or (1 == maxNests[n] and FP_RECURSE == recurse[n]):
             tokens[n] = tokenize(tokens[n])
     return tokens
 
