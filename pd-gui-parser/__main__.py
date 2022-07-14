@@ -217,6 +217,17 @@ def main(argv):
                     line = "cc dd ee {one two} [ list aa bb cc ][list dd ee ff gg]{another four four2 four3} three"
                     """
                     tokens = tokenize(line)
+
+                    # Here https://github.com/pure-data/pure-data/pull/1696#issuecomment-1183768750
+                    # it is stated that it is OK that at some point messages changed
+                    # from
+                    #  ::pdwindow::logpost .x0 4
+                    # to
+                    #  ::pdwindow::logpost 0x0 4
+                    if 3 == len(tokens) and '::pdwindow::logpost' == tokens[0]:
+                        if '.x0' == tokens[1]:
+                            tokens[1] = '0x0'
+
                     # Here we account for the fact that some messages have been
                     # refactored into a single one, such as
                     # from:
