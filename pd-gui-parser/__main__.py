@@ -23,19 +23,18 @@ def tokenize(string):
     string = string + ' ' # force termination
     string = re.sub('[ \t]{1,}', ' ', string) # remove duplicated spaces to make detection more reliable
     # detect [list ... ] and turn it into {... }
-    # this could be done via regexp, but the loops below should make it easier
-    # to handle escaping appropriately (TODO)
     # no need to recurse this as it will be detected as a token below and will
     # be recursed then
     nest = 0
     n = 0
+    escapeOn = False
     while n < len(string):
         c = string[n]
-        if '[' == c:
+        if '[' == c and not escapeOn:
             if 0 == nest:
                 bracketStart = n
             nest = nest = 1
-        if ']' == c:
+        if ']' == c and not escapeOn:
             nest = nest - 1
             if 0 == nest:
                 substr = string[bracketStart:n+1]
@@ -51,6 +50,10 @@ def tokenize(string):
                     string = string[0:bracketStart] + substr + trail
                     # update pointer to end of replacement
                     n = bracketStart + len(substr) -1
+        if '\\' == c and not escapeOn:
+            escapeOn = True
+        else:
+            escapeOn = False
         n = n + 1
     nest = 0
     token = ''
@@ -60,16 +63,16 @@ def tokenize(string):
     maxNest = 0
     whitespace = 0
     # recursively process { } entries
+    escapeOn = False
     for n in range(len(string)):
-        # TODO: handle escaped characters
         c = string[n]
         tokenEnds = False
-        if '{' == c:
+        if '{' == c and not escapeOn:
             if 0 != nest:
                 token = token + c
             nest = nest + 1
             maxNest = max(nest, maxNest)
-        elif '}' == c:
+        elif '}' == c and not escapeOn:
             nest = nest - 1
             if 0 != nest:
                 token = token + c
@@ -79,6 +82,10 @@ def tokenize(string):
             tokenEnds = True
         else:
             token = token + c
+            if '\\' == c and not escapeOn:
+                escapeOn = True
+            else:
+                escapeOn = False
             if ' ' == c:
                 whitespace = whitespace + 1
         if tokenEnds:
