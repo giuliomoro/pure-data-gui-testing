@@ -17,7 +17,7 @@ def detokenize(tokens):
             out = out + ' ' + token
         else:
             out = out + ' {' + detokenize(token) + '}'
-    return out
+    return out.strip()
 
 def tokenize(string):
     string = string + ' ' # force termination
@@ -135,6 +135,7 @@ def main(argv):
             dicId = 0
             firstLine = True
             isPdLog = True
+            sets = {}
             for line in ifile:
                 line = line.strip()
                 # quick check for whether it's XML. This allows us to process
@@ -178,11 +179,49 @@ def main(argv):
                     line = "cc dd ee {one two} [ list aa bb cc ][list dd ee ff gg]{another four four2 four3} three"
                     """
                     tokens = tokenize(line)
+                    # Here we account for the fact that some messages have been
+                    # refactored into a single one, such as
+                    # from:
+                    #   set ::tmp_path
+                    #   lappend ::tmp_path /Users/giulio/Documents/Pd/externals
+                    #   lappend ::tmp_path /Users/giulio/Documents/Pd/externals/context
+                    #   lappend ::tmp_path /Users/giulio/Documents/Pd/patch2svg-plugin
+                    #   set ::sys_searchpath $::tmp_path
+                    # to:
+                    #   set ::sys_searchpath { /Users/giulio/Documents/Pd/externals /Users/giulio/Documents/Pd/externals/context /Users/giulio/Documents/Pd/patch2svg-plugin}
+                    # in:
+                    #   b175797e use helper-functions for repetitive calls to pdgui_vmess()
+                    # it seems that only instances using tmp_path have been
+                    # replaced in that commit
+                    # if we incur in one of these cases, we discard the line with tokens = []
+                    tmpVar = '::tmp_path'
+                    if len(tokens) >= 2 and 'set' == tokens[0]:
+                        if 2 == len(tokens) and tmpVar == tokens[1]:
+                            # initialisation
+                            sets[tmpVar] = []
+                            tokens = []
+                        elif 3 == len(tokens) and '$'+tmpVar == tokens[2]:
+                            # assignment
+                            dest = tokens[1]
+                            sets[dest] = sets[tmpVar]
+                            # the current line becomes the result
+                            tokens = ['set', dest]
+                            if len(sets[dest]):
+                                tokens.append(sets[dest])
+                            del sets[tmpVar]
+                    if len(tokens) >= 2 and 'lappend' == tokens[0]:
+                        # append
+                        if tmpVar == tokens[1]:
+                            for n in range(2, len(tokens)):
+                                sets[tmpVar].append(tokens[n])
+                            tokens = []
+
                     if 3 == len(tokens) and 'set' == tokens[0] and '::sys_staticpath' == tokens[1]:
                         # the path ending with 'extra' is instance-specific
                         # so we replace it
                         for n in range(len(tokens[2])):
                             tokens[2][n] = re.sub(r'.*(\/extra[/]*)$', r'______\1', tokens[2][n])
+
                     line = detokenize(tokens)
 
                 # TODO: we should do some heuristics on ptr len to ensure we
