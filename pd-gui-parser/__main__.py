@@ -155,6 +155,7 @@ def main(argv):
                         line = ''
                     # remove GUI signature
                     line = re.sub(guiLineSignature, '', line).strip()
+                    # ignore pings as they happen at non-deterministic times
                     if line == "pdtk_ping":
                         line = ''
                     # ignore lines exporting svgs as they will have different paths
@@ -236,7 +237,7 @@ def main(argv):
                     # the subplot tag since tag0 was introduced in
                     # 1834a3566a411ee24b4f8e2c9f399f024c11e93a s_template:
                     # convert to pdgui_vmess()
-                    '%s plot%s_array%s_onset-[0-9]+-[0-9]+\+[0-9]+' % (ptrRegex, ptrRegex, ptrRegex),
+                    '%s plot%s_array%s_onset-[0-9]+-[0-9]+\+[0-9]+' % (ptrRegex, ptrRegex, ptrRegex), # TODO: this should be only if "isPdLog"
                     # simple ptr
                     ptrRegex,
                 ]
