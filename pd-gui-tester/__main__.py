@@ -94,7 +94,7 @@ def main(argv):
         # go through all instances of Pd
         for c in range(0, count):
             for b in range(0, len(pds)):
-                outFileName = tmpDir + '/pd-gui-tester-%d' % b
+                outFileName = tmpDir + '/pdgt-%d' % b
                 if 1 != count:
                     outFileName = outFileName + '-%d' % c
                 pdOutFileNames.append(outFileName)
