@@ -163,6 +163,9 @@ def main(argv):
             break
         n = n + 1
     ret = 0
+    # TODO: we should do some heuristics on ptr len to ensure we
+    # use consistent ptr lengths across lines and avoid false positives
+    ptrRegex = '[0-9a-f]{%d,%d}' % (ptrLen[0], ptrLen[1])
     # translate each file
     for idx in range(n, len(argv)):
         inFileName = argv[idx]
@@ -288,12 +291,39 @@ def main(argv):
                                 return -1
                             # We strip the command name and flag and keep the arguments:
                             tokens[2] = body[2]
+                    # The format for pdtk_canvas_setparents changed in
+                    # f87adf86ef8e44e1986779a55c7c63323f47317f use pdgui_vmess() to set window parents
+                    # and
+                    # c0970ee426ec12cb01f4bf74f107c463329d3ee3 pdtk_canvas_setparents: accept lists and canvases (in addition to args and windows)
+                    #
+                    # from
+                    #   pdtk_canvas_setparents .x7fadd3e04f10 .x7fadd3e04dd0 .x7fadd3e04ee0
+                    # to
+                    #   pdtk_canvas_setparents .x7fadd3e04f10 {.x7fadd3e04dd0.c .x7fadd3e04ee0.c }
+                    # i.e.: arguments after the first one are grouped in an array and each ends with .c
+                    # there can be 0 or more of these arguments (if 0, the array is empty)
+                    if len(tokens) >= 3 and 'pdtk_canvas_setparents' == tokens[0]:
+                        # turn old format into new format if neede
+                        if isinstance(tokens[2], list):
+                            newFormat = True
+                        elif len(tokens) > 3:
+                            # more than 3 tokens means old format
+                            newFormat = False
+                        elif re.match('\.x' + ptrRegex + '\.c$', tokens[2]):
+                            # 3 tokens, the last one ends in .c
+                            newFormat = True
+                        else:
+                            newFormat = False
+                        if not newFormat:
+                            for n in range(2, len(tokens)):
+                                tokens[n] = tokens[n] + '.c'
+                            if len(tokens) > 3:
+                                # if we have more than one element, make it a list of all the elements
+                                tokens[2] = tokens[2:]
+                                del tokens[3:]
 
                     line = detokenize(tokens)
 
-                # TODO: we should do some heuristics on ptr len to ensure we
-                # use consistent ptr lengths across lines and avoid false positives
-                ptrRegex = '[0-9a-f]{%d,%d}' % (ptrLen[0], ptrLen[1])
                 # attempt different regexes, the order is important, as we keep
                 # going regardless of whether any match is found
                 # NOTE: these are runnning on post-retokenized strings, so they
