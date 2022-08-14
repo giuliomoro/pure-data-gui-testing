@@ -110,14 +110,10 @@ def main(argv):
                 command = ['python3', pdGuiParser ]
                 if ptrLen:
                     command = command + [ '--ptr-len', ptrLen ]
-                files = []
                 if checkLog:
-                    files.append(outFileName)
+                    runAndHandle(command + [ outFileName ])
                 if checkSvg:
-                    files.append(outFileName + '.svg')
-                command = command + [ outFileName ]
-                ret = runAndHandle(command)
-                print(ret.stdout)
+                    runAndHandle(command + [ outFileName + '.svg' ])
                 # the first execution is taken as a reference.
                 # after that, we compare each execution with that one
                 if b != 0 or c != 0:
