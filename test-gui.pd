@@ -1,13 +1,13 @@
 #N canvas 183 15 986 666 12;
 #X obj 127 230 f;
-#X obj 127 278 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
-#X obj 127 127 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
-1;
+#X obj 127 278 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc
+#000000 #000000 0 1;
+#X obj 127 127 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
+#000000 0 1;
 #X msg 22 182 0, f 2;
-#X obj 127 102 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X floatatom 136 307 5 0 0 0 - - -;
+#X obj 127 102 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#000000 #000000;
+#X floatatom 136 307 5 0 0 0 - - - 0;
 #X obj 224 173 select 1;
 #X obj 127 147 t f f;
 #X msg 221 204 0;
@@ -35,10 +35,10 @@
 #X obj 659 300 s svgSavePath;
 #X obj 658 359 list prepend symbol;
 #X obj 658 385 list trim;
-#X obj 622 422 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
-1;
-#X obj 622 403 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
+#X obj 622 422 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
+#000000 0 1;
+#X obj 622 403 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#000000 #000000;
 #X obj 572 452 spigot;
 #X obj 261 330 r done;
 #X obj 42 130 s done;
@@ -46,15 +46,21 @@
 #X text 220 7 Use "-send" from the command line instead of loadbang
 so that the window is fully loaded and we get consistent behaviour
 ;
-#X obj 345 360 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
-1;
+#X obj 345 360 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
+#000000 0 1;
 #X text 347 309 Use -send for this;
 #X obj 571 340 r done;
 #X obj 571 370 delay 50;
 #X obj 261 363 delay 100;
 #X msg 659 273 /tmp/mypath.svg;
-#X obj 572 414 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
+#X obj 572 414 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#000000 #000000;
+#N canvas 830 231 450 300 test 0;
+#N canvas 47 51 450 300 second 0;
+#N canvas 68 74 450 300 third 0;
+#X restore 175 138 pd third;
+#X restore 171 100 pd second;
+#X restore 128 596 pd test subpatches;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 2 0 7 0;
