@@ -2,6 +2,13 @@
 
 import sys
 import re
+from enum import Flag, auto
+class FT(Flag):
+    NONE = auto()
+    SVG = auto()
+    GT = auto()
+    DOCMDS = auto()
+    PD_LOG = GT | DOCMDS
 
 def usage():
     print('Usage: `pd-gui-parser [--ptr-len 8[,16]] file [other files ... ]`')
@@ -140,14 +147,73 @@ def tokenize(string):
             tokens[n] = tokenize(tokens[n])
     return tokens
 
+def subMatches(lst, line):
+    for item in lst:
+        if re.search('^' + item, line):
+            return True
+    return False
+
+gtGuiLineSignature = '^>>'
+domcdsGuiSignature = "START_DOCMDS" # used to detect file type
+# this is stateful: call it for each line
+def getGui(line, ft):
+    if FT.GT == ft:
+        res = re.search(gtGuiLineSignature, line)
+        if not res:
+            return
+        # remove GUI signature
+        line = re.sub(gtGuiLineSignature, '', line).strip()
+        return line
+    elif FT.DOCMDS == ft:
+        # static variable
+        try:
+            getGui.curr
+        except AttributeError:
+            getGui.curr = 0
+        line = line.strip()
+        if not len(line):
+            return
+        docmdsIgnore = [
+            "::pdtk_canvas::create",
+            "::pdtk_canvas::delete",
+            "::pdtk_canvas::select",
+        ]
+        if subMatches(docmdsIgnore, line):
+            return
+        docmdsKeep = [
+            # nothing here yet
+        ]
+        shouldKeep = False
+        if subMatches(docmdsKeep, line):
+            shouldKeep = True
+
+        # update state
+        if domcdsGuiSignature == line:
+            getGui.curr += 1
+            return
+        elif "STOP_DOCMDS" == line:
+            getGui.curr -= 1
+            return
+        if getGui.curr < 0:
+            raise("Unexpected getGui level." + getGui.curr);
+
+        # return based on state
+        if getGui.curr or shouldKeep:
+            return line
+        else:
+            return
+    else:
+        return
+
 def main(argv):
     if not len(argv):
         return usage()
     n = 0
     ptrLen = [8, 16]
+    forceFileType = FT.NONE
     while n < len(argv):
         if '--ptr-len' == argv[n]:
-            n = n + 1
+            n += 1
             if len(argv) < n + 1:
                 return usage()
             arr = argv[n].split(',')
@@ -159,9 +225,11 @@ def main(argv):
             else:
                 return usage()
             ptrLen = [i0, i1]
+        elif '--plain' == argv[n]:
+            forceFileType = FT.SVG
         else:
             break
-        n = n + 1
+        n += 1
     ret = 0
     # TODO: we should do some heuristics on ptr len to ensure we
     # use consistent ptr lengths across lines and avoid false positives
@@ -169,32 +237,44 @@ def main(argv):
     # translate each file
     for idx in range(n, len(argv)):
         inFileName = argv[idx]
+        fileType = forceFileType
+        if FT.NONE == fileType:
+            with open(inFileName) as file:
+                ifile = iter(file)
+                foundGt = False
+                for line in ifile:
+                    line = line.strip()
+                    # quick check for whether it's XML. This allows us to process
+                    # svg file without much effort
+                    # TODO: it would be safer to parse it and replace all IDs via
+                    # dictionary
+                    if "<?xml version='1.0'?>" == line:
+                        fileType = FT.SVG
+                        break
+                    if domcdsGuiSignature == line:
+                        fileType = FT.DOCMDS
+                        break
+                    if re.search(gtGuiLineSignature, line):
+                        foundGt = True # Do not break here, or we may not detect its a FT.DOCMDS
+                if FT.NONE == fileType and foundGt:
+                    fileType = FT.GT
         with open(inFileName) as file:
             ifile = iter(file)
             out = []
             dic = {}
             dicId = 0
-            firstLine = True
-            isPdLog = True
+            isPdLog = FT.PD_LOG & fileType
             sets = {}
             for line in ifile:
+                if FT.NONE & fileType: #this check could be before "with", but it would require a lot of whitespace changes
+                    break
                 line = line.strip()
-                # quick check for whether it's XML. This allows us to process
-                # svg file without much effort
-                # TODO: it would be safer to parse it and replace all IDs via
-                # dictionary
-                if "<?xml version='1.0'?>" == line:
-                    isPdLog = False
-                firstLine = False
                 if isPdLog:
-                    guiLineSignature = '^>>'
-                    res = re.search(guiLineSignature, line)
+                    line = getGui(line, fileType)
                     # ignore some lines.
-                    if not res:
+                    if not line:
                         # ignore non-GUI line
                         continue
-                    # remove GUI signature
-                    line = re.sub(guiLineSignature, '', line).strip()
                     # ignore pings as they happen at non-deterministic times
                     if line == "pdtk_ping":
                         continue
@@ -204,6 +284,7 @@ def main(argv):
                     #, hence why we do not run this on the tokenized string and we use the `.*`
                     if re.search('pdtk_plugin_dispatch.*::patch2svg::exportall', line):
                         continue
+
                     # "lint" tcl syntax
                     line = re.sub('[ \t]{1,}', ' ', line) # remove duplicated spaces
                     line = re.sub('\{[ \t]{1,}', '{', line) # remove spaces around braces
