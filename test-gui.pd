@@ -1,74 +1,83 @@
-#N canvas 183 15 986 666 12;
-#X obj 127 230 f;
-#X obj 127 278 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc
+#N canvas 204 5 1076 718 12;
+#X obj 138 234 f;
+#X obj 138 282 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc
 #000000 #000000 0 1;
-#X obj 127 127 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
+#X obj 138 131 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
 #000000 0 1;
-#X msg 22 182 0, f 2;
-#X obj 127 102 bng 15 250 50 0 empty empty my\\\;label 17 7 0 10 #fcfcfc
+#X msg 33 186 0, f 2;
+#X obj 138 106 bng 15 250 50 0 empty empty my\\\;label 17 7 0 10 #fcfcfc
 #000000 #000000;
-#X floatatom 136 307 5 0 0 0 - - - 0;
-#X obj 224 173 select 1;
-#X obj 127 147 t f f;
-#X msg 221 204 0;
-#X obj 127 254 + 10;
-#X obj 138 362 > 100;
-#X obj 138 398 select 1;
-#X obj 127 203 metro 200;
-#X msg 261 468 \; pd quit;
-#X obj 345 330 r autoquit;
-#X obj 261 411 f;
-#X obj 261 440 select 1;
-#X text 39 505 Quit automatically (e.g.: for batch testing);
-#X obj 43 98 t b f;
-#X obj 126 12 r autostart;
+#X floatatom 147 311 5 0 0 0 - - - 0;
+#X obj 235 177 select 1;
+#X obj 138 151 t f f;
+#X msg 232 208 0;
+#X obj 138 258 + 10;
+#X obj 149 366 > 100;
+#X obj 149 402 select 1;
+#X obj 138 207 metro 200;
+#X msg 272 472 \; pd quit;
+#X obj 356 334 r autoquit;
+#X obj 272 415 f;
+#X obj 272 444 select 1;
+#X text 50 509 Quit automatically (e.g.: for batch testing);
+#X obj 54 102 t b f;
+#X obj 137 16 r autostart;
 #N canvas 0 22 450 278 (subpatch) 0;
 #X array array1 10 float 2;
 #X coords 0 1 10 -1 200 140 1;
-#X restore 676 86 graph;
-#X msg 572 572 \; pd plugin-dispatch ::patch2svg::exportall \$1;
-#X obj 572 479 symbol;
-#X obj 658 334 r svgSavePath;
-#X obj 659 300 s svgSavePath;
-#X obj 658 359 list prepend symbol;
-#X obj 658 385 list trim;
-#X obj 622 422 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
+#X restore 687 90 graph;
+#X msg 583 576 \; pd plugin-dispatch ::patch2svg::exportall \$1;
+#X obj 583 483 symbol;
+#X obj 669 338 r svgSavePath;
+#X obj 670 304 s svgSavePath;
+#X obj 669 363 list prepend symbol;
+#X obj 669 389 list trim;
+#X obj 633 426 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
 #000000 0 1;
-#X obj 622 403 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#X obj 633 407 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
 #000000 #000000;
-#X obj 572 452 spigot;
-#X obj 261 330 r done;
-#X obj 42 130 s done;
-#X text 765 329 Use -send for this;
-#X obj 345 360 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
+#X obj 583 456 spigot;
+#X obj 272 334 r done;
+#X obj 53 134 s done;
+#X text 776 333 Use -send for this;
+#X obj 356 364 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
 #000000 0 1;
-#X text 347 309 Use -send for this;
-#X obj 571 340 r done;
-#X obj 571 370 delay 50;
-#X obj 261 363 delay 100;
-#X msg 659 273 /tmp/mypath.svg;
-#X obj 572 414 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#X text 358 313 Use -send for this;
+#X obj 582 344 r done;
+#X obj 582 374 delay 50;
+#X obj 272 367 delay 100;
+#X msg 670 277 /tmp/mypath.svg;
+#X obj 583 418 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
 #000000 #000000;
-#N canvas 830 231 450 300 test 0;
+#N canvas 830 231 450 300 test 1;
 #N canvas 47 51 450 300 second 0;
 #N canvas 68 74 450 300 third 0;
 #X restore 175 138 pd third;
 #X restore 171 100 pd second;
-#X restore 128 596 pd test subpatches;
-#X listbox 391 216 20 0 0 0 - - - 0;
-#X obj 572 506 t s s;
-#X obj 356 431 namecanvas mycnv;
-#X msg 426 601 \; mycnv selectall;
-#X obj 437 540 delay 500;
-#X text 365 569 Test select behaviour;
-#X obj 137 334 t f f;
-#X obj 423 511 delay 1500;
-#X obj 357 164 makefilename ___====%d;
-#X msg 126 43 bang;
-#X obj 127 72 delay 2000;
-#X text 220 7 Use "-send" from the command line;
-#X obj 423 462 r autostart;
-#X msg 423 486 bang;
+#X restore 313 673 pd test subpatches;
+#X listbox 402 220 20 0 0 0 - - - 0;
+#X obj 583 510 t s s;
+#X obj 367 435 namecanvas mycnv;
+#X msg 437 605 \; mycnv selectall;
+#X obj 448 544 delay 500;
+#X text 376 573 Test select behaviour;
+#X obj 148 338 t f f;
+#X obj 434 515 delay 1500;
+#X obj 368 168 makefilename ___====%d;
+#X msg 137 47 bang;
+#X obj 138 76 delay 2000;
+#X text 231 11 Use "-send" from the command line;
+#X obj 434 466 r autostart;
+#X msg 434 490 bang;
+#N canvas 64 125 249 285 myscratch 1;
+#X restore 304 646 pd myscratch;
+#X obj 16 673 s pd-myscratch;
+#X msg 50 638 clear;
+#X obj 51 434 delay 275;
+#X obj 28 386 t b b b;
+#X msg 16 542 obj 100 10 pack f f f \, obj 100 50 nbx \, obj 100 90
+hslider \, obj 100 130 bng \, obj 100 170 vslider \, floatatom 150
+210;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 2 0 7 0;
@@ -115,5 +124,11 @@
 #X connect 49 0 41 0;
 #X connect 50 0 51 0;
 #X connect 51 0 4 0;
+#X connect 51 0 59 0;
 #X connect 53 0 54 0;
 #X connect 54 0 48 0;
+#X connect 57 0 56 0;
+#X connect 58 0 57 0;
+#X connect 59 0 58 0;
+#X connect 59 1 60 0;
+#X connect 60 0 56 0;
