@@ -176,6 +176,7 @@ def getGui(line, ft):
         docmdsIgnore = [
             "::pdtk_canvas::create",
             "::pdtk_canvas::delete",
+            "::pdtk_canvas::move",
             "::pdtk_canvas::select",
         ]
         if subMatches(docmdsIgnore, line):
