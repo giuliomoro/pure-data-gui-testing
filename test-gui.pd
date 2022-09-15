@@ -71,13 +71,17 @@
 #X msg 434 490 bang;
 #N canvas 64 125 249 285 myscratch 1;
 #X restore 304 646 pd myscratch;
-#X obj 16 673 s pd-myscratch;
-#X msg 50 638 clear;
-#X obj 51 434 delay 275;
+#X obj 25 681 s pd-myscratch;
+#X msg 169 645 clear;
 #X obj 28 386 t b b b;
-#X msg 16 542 obj 100 10 pack f f f \, obj 100 50 nbx \, obj 100 90
+#X obj 532 300 list;
+#X msg 16 541 obj 100 10 pack f f f \, obj 100 50 nbx \, obj 100 90
 hslider \, obj 100 130 bng \, obj 100 170 vslider \, floatatom 150
 210;
+#X obj 61 583 delay 150;
+#X obj 170 590 delay 375;
+#X msg 60 622 selectall \, key 1 63233 0 \, key 0 63233 0;
+#X text 65 601 Move;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 2 0 7 0;
@@ -124,11 +128,14 @@ hslider \, obj 100 130 bng \, obj 100 170 vslider \, floatatom 150
 #X connect 49 0 41 0;
 #X connect 50 0 51 0;
 #X connect 51 0 4 0;
-#X connect 51 0 59 0;
+#X connect 51 0 58 0;
 #X connect 53 0 54 0;
 #X connect 54 0 48 0;
 #X connect 57 0 56 0;
-#X connect 58 0 57 0;
-#X connect 59 0 58 0;
-#X connect 59 1 60 0;
+#X connect 58 0 62 0;
+#X connect 58 1 61 0;
+#X connect 58 2 60 0;
 #X connect 60 0 56 0;
+#X connect 61 0 63 0;
+#X connect 62 0 57 0;
+#X connect 63 0 56 0;
