@@ -174,10 +174,12 @@ def getGui(line, ft):
         if not len(line):
             return
         docmdsIgnore = [
+            "::pdtk_canvas::config",
             "::pdtk_canvas::create",
             "::pdtk_canvas::delete",
             "::pdtk_canvas::move",
             "::pdtk_canvas::select",
+            "::pdtk_canvas::update",
         ]
         if subMatches(docmdsIgnore, line):
             return
