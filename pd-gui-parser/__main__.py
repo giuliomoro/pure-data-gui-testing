@@ -177,6 +177,8 @@ def getGui(line, ft):
             "::pdtk_canvas::config",
             "::pdtk_canvas::create",
             "::pdtk_canvas::delete",
+            "::pdtk_canvas::iemgui_label_font",
+            "::pdtk_canvas::iemgui_label_pos",
             "::pdtk_canvas::move",
             "::pdtk_canvas::select",
             "::pdtk_canvas::update",
