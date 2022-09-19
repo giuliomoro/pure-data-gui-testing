@@ -5,7 +5,7 @@
 #X obj 138 131 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
 #000000 0 1;
 #X msg 33 186 0, f 2;
-#X obj 138 106 bng 15 250 50 0 empty empty my\\\;label 17 7 0 10 #fcfcfc
+#X obj 138 106 bng 15 250 50 0 empty empty mylabel 20 10 0 10 #fcfcfc
 #000000 #000000;
 #X floatatom 147 311 5 0 0 0 - - - 0;
 #X obj 235 177 select 1;
@@ -69,7 +69,17 @@
 #X text 231 11 Use "-send" from the command line;
 #X obj 434 466 r autostart;
 #X msg 434 490 bang;
-#N canvas 64 125 249 285 myscratch 1;
+#N canvas 0 143 249 285 myscratch 1;
+#X obj 100 10 pack f f f;
+#X obj 100 50 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+#fcfcfc #000000 #000000 0 256;
+#X obj 100 90 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc
+#000000 #000000 0 1;
+#X obj 100 130 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc
+#000000 #000000;
+#X obj 100 170 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 #fcfcfc
+#000000 #000000 0 1;
+#X floatatom 150 210 0 0 0 0 - - - 0;
 #X restore 304 646 pd myscratch;
 #X obj 25 681 s pd-myscratch;
 #X msg 169 645 clear;
@@ -82,6 +92,10 @@ hslider \, obj 100 130 bng \, obj 100 170 vslider \, floatatom 150
 #X obj 170 590 delay 375;
 #X msg 60 622 selectall \, key 1 63233 0 \, key 0 63233 0;
 #X text 65 601 Move;
+#X msg 282 66 label_font 2 30;
+#X msg 425 65 label_pos 1 30;
+#X obj 425 38 delay 80;
+#X obj 282 33 delay 100;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 2 0 7 0;
@@ -129,6 +143,7 @@ hslider \, obj 100 130 bng \, obj 100 170 vslider \, floatatom 150
 #X connect 50 0 51 0;
 #X connect 51 0 4 0;
 #X connect 51 0 58 0;
+#X connect 51 0 68 0;
 #X connect 53 0 54 0;
 #X connect 54 0 48 0;
 #X connect 57 0 56 0;
@@ -139,3 +154,8 @@ hslider \, obj 100 130 bng \, obj 100 170 vslider \, floatatom 150
 #X connect 61 0 63 0;
 #X connect 62 0 57 0;
 #X connect 63 0 56 0;
+#X connect 65 0 4 0;
+#X connect 66 0 4 0;
+#X connect 67 0 66 0;
+#X connect 68 0 67 0;
+#X connect 68 0 65 0;
